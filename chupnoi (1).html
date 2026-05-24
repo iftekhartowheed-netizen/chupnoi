@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>চুপ নই | ChupNoi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --black: #0a0a0a; --white: #f5f0e8; --red: #c0392b;
+            --red-dark: #922b21; --muted: #888; --border: #1a1a1a;
+        }
+        html { scroll-behavior: smooth; }
+        body { background: var(--black); color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 16px; line-height: 1.7; }
+
+        /* hide/show by lang */
+        body.lang-en .t-bn { display: none !important; }
+        body.lang-bn .t-en { display: none !important; }
+
+        /* NAV */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 40px; background: rgba(10,10,10,0.97);
+            backdrop-filter: blur(12px); border-bottom: 1px solid var(--border);
+            gap: 12px;
+        }
+        .nav-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 900; color: var(--white); cursor: pointer; white-space: nowrap; }
+        .nav-logo span { color: var(--red); }
+        .nav-center { display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; }
+        .nav-right { display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+
+        .nav-tab {
+            background: none; border: 1px solid #2a2a2a; color: var(--muted);
+            padding: 6px 14px; font-family: 'DM Sans', sans-serif; font-size: 11px;
+            font-weight: 500; cursor: pointer; transition: all 0.2s; letter-spacing: 0.4px;
+        }
+        .nav-tab:hover, .nav-tab.active { background: var(--red); border-color: var(--red); color: var(--white); }
+
+        /* LANG TOGGLE */
+        .lang-toggle { display: flex; border: 1px solid #2a2a2a; overflow: hidden; }
+        .lang-btn {
+            background: none; border: none; color: var(--muted);
+            padding: 6px 12px; font-family: 'DM Sans', sans-serif; font-size: 11px;
+            font-weight: 700; cursor: pointer; transition: all 0.2s; letter-spacing: 1px;
+        }
+        .lang-btn.active { background: var(--white); color: var(--black); }
+        .lang-divider { width: 1px; background: #2a2a2a; }
+
+        /* SECTIONS */
+        .section { display: none; min-height: 100vh; animation: fadeIn 0.35s ease; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* HOME */
+        #home {
+            min-height: 100vh; display: flex; flex-direction: column;
+            justify-content: center; padding: 120px 48px 80px;
+            position: relative; overflow: hidden;
+        }
+        #home::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(ellipse at 20% 50%, rgba(192,57,43,0.07) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .hero-eyebrow { font-size: 10px; letter-spacing: 3.5px; text-transform: uppercase; color: var(--red); margin-bottom: 24px; font-weight: 600; }
+        .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(52px, 8vw, 100px); font-weight: 900; line-height: 0.95; letter-spacing: -2px; margin-bottom: 32px; max-width: 800px; }
+        .hero-title .accent { color: var(--red); font-style: italic; }
+        .hero-tagline { font-size: clamp(15px, 2vw, 20px); color: #999; margin-bottom: 56px; max-width: 480px; font-weight: 300; line-height: 1.65; }
+        .hero-tagline strong { color: var(--white); font-weight: 500; }
+        .hero-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); max-width: 680px; margin-bottom: 48px; border: 1px solid var(--border); }
+        .stat-box { background: var(--black); padding: 28px 32px; transition: background 0.2s; }
+        .stat-box:hover { background: #0e0e0e; }
+        .stat-number { font-family: 'Playfair Display', serif; font-size: 40px; font-weight: 900; color: var(--red); line-height: 1; margin-bottom: 8px; }
+        .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 500; }
+        .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; }
+        .btn-primary { background: var(--red); color: var(--white); border: none; padding: 14px 32px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; letter-spacing: 1px; text-transform: uppercase; transition: background 0.2s; text-decoration: none; display: inline-block; }
+        .btn-primary:hover { background: var(--red-dark); }
+        .btn-secondary { background: transparent; color: var(--white); border: 1px solid #3a3a3a; padding: 14px 32px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; letter-spacing: 1px; text-transform: uppercase; transition: all 0.2s; text-decoration: none; display: inline-block; }
+        .btn-secondary:hover { border-color: #666; }
+
+        /* SHARED PAGE STYLES */
+        .page-wrap { padding: 120px 48px 80px; }
+        .page-label { font-size: 10px; letter-spacing: 3.5px; text-transform: uppercase; color: var(--red); margin-bottom: 16px; font-weight: 600; }
+        .page-title { font-family: 'Playfair Display', serif; font-size: clamp(34px, 5vw, 60px); font-weight: 900; line-height: 1.0; letter-spacing: -1px; margin-bottom: 52px; max-width: 700px; }
+        .page-title .accent { color: var(--red); font-style: italic; }
+        .red-bar { border-left: 3px solid var(--red); padding: 28px 36px; background: #0d0d0d; margin-bottom: 24px; }
+        .red-bar p { font-size: 15px; color: #999; line-height: 1.85; margin-bottom: 14px; }
+        .red-bar p:last-child { margin-bottom: 0; }
+        .red-bar strong { color: var(--white); font-weight: 500; }
+        .red-bar em { color: var(--red); font-style: normal; font-weight: 600; }
+        .section-intro { font-size: 15px; color: #888; max-width: 680px; line-height: 1.85; margin-bottom: 56px; }
+        .section-intro strong { color: var(--white); font-weight: 500; }
+
+        /* WHO ARE WE */
+        .who-opener { font-family: 'Playfair Display', serif; font-size: clamp(22px, 3vw, 32px); font-weight: 700; color: var(--red); margin-bottom: 44px; font-style: italic; }
+        .who-not-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--border); margin-bottom: 56px; border: 1px solid var(--border); }
+        .who-not-card { background: var(--black); padding: 36px 40px; border-left: 3px solid transparent; transition: border-color 0.2s; }
+        .who-not-card:hover { border-left-color: #2a2a2a; }
+        .who-not-card .cross { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #444; margin-bottom: 12px; font-weight: 600; }
+        .who-not-card h3 { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--white); margin-bottom: 12px; }
+        .who-not-card p { font-size: 14px; color: #777; line-height: 1.7; }
+        .who-are-block { background: #0d0d0d; border-left: 3px solid var(--red); padding: 44px 48px; margin-bottom: 44px; }
+        .who-are-block .blabel { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--red); margin-bottom: 20px; font-weight: 600; }
+        .who-are-block p { font-size: 15px; color: #bbb; line-height: 1.85; margin-bottom: 18px; }
+        .who-are-block p:last-child { margin-bottom: 0; }
+        .who-are-block strong { color: var(--white); font-weight: 500; }
+        .who-promise { padding: 40px 0; border-top: 1px solid var(--border); }
+        .who-promise p { font-size: 15px; color: #888; line-height: 1.85; margin-bottom: 18px; max-width: 720px; }
+        .who-promise strong { color: var(--white); font-weight: 500; }
+        .who-tagline { font-family: 'Playfair Display', serif; font-size: clamp(19px, 2.5vw, 27px); font-weight: 700; color: var(--red); margin-top: 36px; font-style: italic; }
+        .who-tagline span { font-size: 0.75em; color: #777; font-style: normal; font-family: 'DM Sans', sans-serif; font-weight: 400; display: block; margin-top: 6px; }
+
+        /* PROBLEM */
+        .problem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); margin: 52px 0; }
+        .problem-card { background: var(--black); padding: 40px; border-left: 3px solid transparent; transition: border-color 0.2s; }
+        .problem-card:hover { border-left-color: var(--red); }
+        .problem-card .card-number { font-family: 'Playfair Display', serif; font-size: 54px; font-weight: 900; color: var(--red); line-height: 1; margin-bottom: 14px; opacity: 0.5; }
+        .problem-card h3 { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; margin-bottom: 12px; color: var(--white); }
+        .problem-card p { color: #777; line-height: 1.7; font-size: 14px; }
+        .contrast-block { background: #0d0d0d; border: 1px solid var(--border); padding: 44px; margin-bottom: 48px; }
+        .contrast-block h3 { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; margin-bottom: 28px; color: var(--white); }
+        .contrast-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 16px; }
+        .contrast-item { padding: 22px; border-left: 3px solid #333; }
+        .contrast-item.good { border-left-color: #27ae60; }
+        .contrast-item.bad { border-left-color: var(--red); }
+        .contrast-item .clabel { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; font-weight: 600; }
+        .contrast-item.good .clabel { color: #27ae60; }
+        .contrast-item.bad .clabel { color: var(--red); }
+        .contrast-item .value { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: var(--white); margin-bottom: 6px; }
+        .contrast-item .desc { font-size: 13px; color: var(--muted); }
+        .problem-appeal { padding: 44px 0; border-top: 1px solid var(--border); }
+        .problem-appeal p { font-size: 15px; color: #888; line-height: 1.85; margin-bottom: 16px; max-width: 700px; }
+        .problem-appeal strong { color: var(--white); font-weight: 500; }
+        .problem-appeal .closing { font-family: 'Playfair Display', serif; font-size: clamp(18px, 2.5vw, 26px); font-weight: 700; color: var(--red); margin-top: 32px; font-style: italic; }
+
+        /* CHARTER */
+        .charter-part-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #555; margin-bottom: 10px; font-weight: 600; }
+        .charter-part-title { font-family: 'Playfair Display', serif; font-size: clamp(24px, 3.5vw, 38px); font-weight: 900; color: var(--white); margin-bottom: 10px; line-height: 1.1; }
+        .charter-part-sub { font-size: 14px; color: #666; margin-bottom: 36px; max-width: 580px; line-height: 1.7; }
+        .demand-list { margin-bottom: 64px; }
+        .demand-item { display: grid; grid-template-columns: 56px 1fr; border-bottom: 1px solid var(--border); }
+        .demand-item:first-child { border-top: 1px solid var(--border); }
+        .demand-num { padding: 28px 0; display: flex; align-items: flex-start; }
+        .demand-num span { font-family: 'Playfair Display', serif; font-size: 13px; font-weight: 700; color: var(--red); opacity: 0.7; }
+        .demand-content { padding: 28px 0 28px 22px; border-left: 1px solid var(--border); transition: border-left-color 0.2s; }
+        .demand-item:hover .demand-content { border-left-color: var(--red); }
+        .demand-content h4 { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--white); margin-bottom: 10px; }
+        .demand-content p { font-size: 14px; color: #777; line-height: 1.75; max-width: 680px; }
+        .charter-divider { border: none; border-top: 1px solid var(--border); margin: 56px 0 48px; }
+        .charter-vision { background: #0d0d0d; border-left: 3px solid var(--red); padding: 36px 44px; margin-top: 48px; }
+        .charter-vision p { font-size: 15px; color: #999; line-height: 1.85; margin-bottom: 14px; }
+        .charter-vision p:last-child { margin-bottom: 0; }
+        .charter-vision strong { color: var(--white); font-weight: 500; }
+        .charter-vision .closing { font-family: 'Playfair Display', serif; font-size: clamp(18px, 2.5vw, 26px); font-weight: 700; color: var(--red); margin-top: 20px; font-style: italic; }
+
+        /* PLEDGE */
+        .pledge-tabs { display: flex; gap: 1px; background: var(--border); margin-bottom: 44px; }
+        .pledge-tab { flex: 1; background: var(--black); border: none; color: var(--muted); padding: 18px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; text-align: center; }
+        .pledge-tab:hover { background: #111; color: var(--white); }
+        .pledge-tab.active { background: var(--red); color: var(--white); }
+        .pledge-form-container { display: none; }
+        .pledge-form-container.active { display: block; animation: fadeIn 0.3s ease; }
+        .pledge-intro { background: #0d0d0d; border-left: 3px solid var(--red); padding: 24px 30px; margin-bottom: 32px; font-size: 14px; color: #999; line-height: 1.75; }
+        .pledge-intro strong { color: var(--white); }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+        .form-field { display: flex; flex-direction: column; gap: 8px; }
+        .form-field label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+        .form-field input, .form-field select, .form-field textarea { background: #0f0f0f; border: 1px solid #222; color: var(--white); padding: 12px 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; transition: border-color 0.2s; outline: none; width: 100%; }
+        .form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: var(--red); }
+        .form-field select option { background: #111; }
+        .form-full { grid-column: 1 / -1; }
+        .pledge-submit { margin-top: 18px; background: var(--red); color: var(--white); border: none; padding: 14px 34px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; letter-spacing: 1px; text-transform: uppercase; transition: background 0.2s; }
+        .pledge-submit:hover { background: var(--red-dark); }
+        .pledged-list { margin-top: 60px; }
+        .pledged-list h3 { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; margin-bottom: 22px; color: var(--white); }
+        .pledged-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); }
+        .pledged-card { background: var(--black); padding: 24px 28px; }
+        .pledged-card .name { font-weight: 600; font-size: 14px; margin-bottom: 4px; color: var(--white); }
+        .pledged-card .role { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+        .pledged-card .org { font-size: 12px; color: #555; margin-top: 8px; }
+
+        /* REPORT */
+        .tier-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); margin-bottom: 52px; }
+        .tier-card { background: var(--black); padding: 34px; }
+        .tier-indicator { width: 10px; height: 10px; border-radius: 50%; margin-bottom: 18px; }
+        .tier-green { background: #27ae60; } .tier-yellow { background: #f39c12; } .tier-red { background: var(--red); }
+        .tier-card h3 { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; margin-bottom: 10px; color: var(--white); }
+        .tier-card p { font-size: 13px; color: var(--muted); line-height: 1.65; }
+        .report-cta-block { background: #0d0d0d; border: 1px solid var(--border); padding: 44px; text-align: center; margin-bottom: 44px; }
+        .report-cta-block h3 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; margin-bottom: 12px; }
+        .report-cta-block p { color: #888; margin-bottom: 26px; max-width: 480px; margin-left: auto; margin-right: auto; font-size: 14px; line-height: 1.7; }
+        .process-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); }
+        .step { background: var(--black); padding: 30px; }
+        .step-number { font-family: 'Playfair Display', serif; font-size: 42px; font-weight: 900; color: #1a1a1a; line-height: 1; margin-bottom: 12px; }
+        .step h4 { font-size: 13px; font-weight: 600; color: var(--white); margin-bottom: 6px; letter-spacing: 0.5px; }
+        .step p { font-size: 12px; color: var(--muted); line-height: 1.55; }
+
+        /* FOOTER */
+        footer { border-top: 1px solid var(--border); padding: 36px 48px; display: flex; justify-content: space-between; align-items: center; }
+        footer .logo { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 900; }
+        footer .logo span { color: var(--red); }
+        footer p { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+        /* MOBILE */
+        @media (max-width: 768px) {
+            nav { padding: 12px 16px; flex-wrap: wrap; gap: 8px; }
+            .nav-center { gap: 3px; }
+            .nav-tab { padding: 5px 8px; font-size: 10px; }
+            #home, .page-wrap { padding: 96px 20px 56px; }
+            .hero-stats, .problem-grid, .who-not-grid, .tier-grid { grid-template-columns: 1fr; }
+            .contrast-row { grid-template-columns: 1fr; }
+            .form-grid { grid-template-columns: 1fr; }
+            .process-steps { grid-template-columns: 1fr 1fr; }
+            .pledged-grid { grid-template-columns: 1fr; }
+            .demand-item { grid-template-columns: 40px 1fr; }
+            footer { flex-direction: column; gap: 14px; text-align: center; }
+        }
+    </style>
+</head>
+<body class="lang-bn">
+
+<nav>
+    <div class="nav-logo" onclick="showSection('home')">চুপ <span>নই</span></div>
+    <div class="nav-center">
+        <button class="nav-tab active" onclick="showSection('home')">
+            <span class="t-bn">হোম</span><span class="t-en">Home</span>
+        </button>
+        <button class="nav-tab" onclick="showSection('whoarewe')">
+            <span class="t-bn">আমরা কে</span><span class="t-en">Who Are We</span>
+        </button>
+        <button class="nav-tab" onclick="showSection('problem')">
+            <span class="t-bn">সমস্যা</span><span class="t-en">The Problem</span>
+        </button>
+        <button class="nav-tab" onclick="showSection('charter')">
+            <span class="t-bn">আমাদের সনদ</span><span class="t-en">Our Charter</span>
+        </button>
+        <button class="nav-tab" onclick="showSection('pledge')">
+            <span class="t-bn">সহযোগিতা</span><span class="t-en">Pledge Support</span>
+        </button>
+        <button class="nav-tab" onclick="showSection('report')">
+            <span class="t-bn">রিপোর্ট করুন</span><span class="t-en">Report a Case</span>
+        </button>
+    </div>
+    <div class="nav-right">
+        <div class="lang-toggle">
+            <button class="lang-btn active" id="btn-bn" onclick="setLang('bn')">বাং</button>
+            <div class="lang-divider"></div>
+            <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+        </div>
+    </div>
+</nav>
+
+<!-- ======= HOME ======= -->
+<div id="home" class="section active">
+    <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 20% 50%,rgba(192,57,43,0.07) 0%,transparent 60%);pointer-events:none;"></div>
+
+    <div class="hero-eyebrow t-bn">বাংলাদেশ শিশু সুরক্ষা উদ্যোগ</div>
+    <div class="hero-eyebrow t-en">Bangladesh Child Safety Initiative</div>
+
+    <h1 class="hero-title">
+        <span class="t-bn">চুপ নই।<br><span class="accent">থামব না।</span></span>
+        <span class="t-en">চুপ নই।<br><span class="accent">Not Silent.</span></span>
+    </h1>
+
+    <p class="hero-tagline">
+        <span class="t-bn"><strong>আমরা দেখছি। আমরা বলব।</strong><br>আমরা সাধারণ মানুষ। একটা শিশু কষ্ট পেলে ঘুমাতে পারি না। তাই এটা বানিয়েছি।</span>
+        <span class="t-en"><strong>আমরা দেখছি। আমরা বলব।</strong><br>We are ordinary people. We cannot sleep when a child is hurt. So we built this.</span>
+    </p>
+
+    <div class="hero-stats">
+        <div class="stat-box">
+            <div class="stat-number">৭,০৬৮</div>
+            <div class="stat-label t-bn">২০২৫ সালে ধর্ষণ মামলা</div>
+            <div class="stat-label t-en">Rape cases in 2025</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number">২৭%</div>
+            <div class="stat-label t-bn">২০২৪ থেকে বৃদ্ধি</div>
+            <div class="stat-label t-en">Increase from 2024</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number">৯৯%</div>
+            <div class="stat-label t-bn">মামলা জনগণের কাছে অদৃশ্য</div>
+            <div class="stat-label t-en">Cases invisible to public</div>
+        </div>
+    </div>
+
+    <div class="hero-cta">
+        <a href="#" class="btn-primary" onclick="showSection('report');return false;">
+            <span class="t-bn">রিপোর্ট করুন</span><span class="t-en">Report a Case</span>
+        </a>
+        <a href="#" class="btn-secondary" onclick="showSection('problem');return false;">
+            <span class="t-bn">সমস্যাটা বুঝুন</span><span class="t-en">Understand the Problem</span>
+        </a>
+    </div>
+</div>
+
+<!-- ======= WHO ARE WE ======= -->
+<div id="whoarewe" class="section">
+<div class="page-wrap">
+    <div class="page-label t-bn">চুপ নই সম্পর্কে</div>
+    <div class="page-label t-en">About ChupNoi</div>
+    <h2 class="page-title">
+        <span class="t-bn">আমরা কে?<br><span class="accent">সত্যি কথা।</span></span>
+        <span class="t-en">আমরা কে?<br><span class="accent">Who Are We?</span></span>
+    </h2>
+
+    <p class="who-opener t-bn">সত্যি বলতে, আমরা কেউ না।</p>
+    <p class="who-opener t-en">Honestly? We are nobody.</p>
+
+    <div class="who-not-grid">
+        <div class="who-not-card">
+            <div class="cross t-bn">এটা না</div>
+            <div class="cross t-en">Not this</div>
+            <h3 class="t-bn">কোনো এনজিও না</h3>
+            <h3 class="t-en">An NGO</h3>
+            <p class="t-bn">কোনো রেজিস্ট্রেশন নম্বর নেই। কোনো বার্ষিক প্রতিবেদন নেই। বিদেশি অনুদান নেই। আমরা সেই মানুষ না যারা বিদেশ থেকে টাকা এনে সমাজ বদলানোর ভান করে।</p>
+            <p class="t-en">No registration number. No annual report. No foreign grant keeping the lights on. We are not the kind of people who fly in funding from abroad and call it changing society.</p>
+        </div>
+        <div class="who-not-card">
+            <div class="cross t-bn">এটা না</div>
+            <div class="cross t-en">Not this</div>
+            <h3 class="t-bn">রাজনীতিবিদ না</h3>
+            <h3 class="t-en">Politicians</h3>
+            <p class="t-bn">কোনো দলের পতাকা নেই। কোনো নির্বাচনী এলাকা নেই। ক্ষমতার কোনো হিসেব নেই আমাদের মাথায়। আমরা এখানে নিজেদের জন্য কোনো আন্দোলন গড়তে আসিনি।</p>
+            <p class="t-en">No party flag. No constituency. No seat at any table where decisions are made. We are not here to build a movement that serves us.</p>
+        </div>
+        <div class="who-not-card">
+            <div class="cross t-bn">এটা না</div>
+            <div class="cross t-en">Not this</div>
+            <h3 class="t-bn">সেলিব্রিটি না</h3>
+            <h3 class="t-en">Celebrities</h3>
+            <p class="t-bn">আমাদের ছবি এই ওয়েবসাইটে নেই। ইচ্ছে করেই। আমরা পরিচিত মুখ দিয়ে মানুষের মনোযোগ কিনতে চাই না। এটা আমাদের সম্পর্কে না।</p>
+            <p class="t-en">Our photos are not on this website. That is a deliberate choice. We do not want to buy anyone's attention with a familiar face. This is not about us.</p>
+        </div>
+        <div class="who-not-card">
+            <div class="cross t-bn">এটা না</div>
+            <div class="cross t-en">Not this</div>
+            <h3 class="t-bn">অফিস আছে এমন মানুষ না</h3>
+            <h3 class="t-en">People With an Office</h3>
+            <p class="t-bn">কোনো বোর্ডরুম নেই। কোনো সম্মেলন টেবিল নেই। আমরা যা ছিল তাই দিয়ে এটা বানিয়েছি, কারণ আর অপেক্ষা করতে পারিনি।</p>
+            <p class="t-en">No boardroom. No conference table. We built this from whatever we had, because we could not keep waiting for someone else to.</p>
+        </div>
+    </div>
+
+    <div class="who-are-block">
+        <div class="blabel t-bn">আমরা আসলে কে</div>
+        <div class="blabel t-en">What we are</div>
+        <p class="t-bn">আমরা শুধু <strong>কিছু সাধারণ মানুষ</strong>। যারা রাতে ঘুমাতে পারি না যখন শুনি একটা শিশুকে কেউ কষ্ট দিয়েছে। যারা সকালে খবরের কাগজ খুলতে ভয় পাই, কারণ আজও কোথাও না কোথাও কিছু একটা হয়েছে।</p>
+        <p class="t-en">We are just <strong>ordinary people</strong>. People who cannot sleep at night when they hear a child has been hurt. People who open the newspaper in the morning with dread, because they know that somewhere, again, something has happened.</p>
+        <p class="t-bn">যারা ফেসবুকে স্ক্রল করতে করতে হঠাৎ থেমে যাই, বুকে একটা চাপ অনুভব করি, আর ভাবি, এরপর কী? কে কিছু করছে?</p>
+        <p class="t-en">People who scroll through their feed and suddenly stop, feel something heavy settle in their chest, and think: what happens next? Who is doing something about this?</p>
+        <p class="t-bn">আমরা সেই মানুষ যারা শুধু রাগ করেই থামতে পারিনি। যারা ভেবেছি, রাগটাকে কাজে লাগানো যায় কিনা।</p>
+        <p class="t-en">We are people who could not stop at anger. Who asked themselves whether the anger could be turned into something useful.</p>
+    </div>
+
+    <div class="who-promise">
+        <p class="t-bn">আমরা সরকারের বিরোধী না। <strong>আমরা চাই সরকার তার কাজ করুক।</strong> কিন্তু আমরা এটাও জানি যে চুপ করে বসে থাকলে শিশুরা কষ্ট পেতেই থাকবে।</p>
+        <p class="t-en">We are not against the government. <strong>We want the government to do its job.</strong> But we also know that waiting and watching while children get hurt is not an option.</p>
+        <p class="t-bn">এই দেশের ইতিহাস বলে, পরিবর্তন তখনই আসে যখন সাধারণ মানুষ নিজে দাঁড়ায়। ভাষা আন্দোলন। মুক্তিযুদ্ধ। স্বৈরাচারের পতন। কোনোটাই হয়নি কারণ ক্ষমতায় থাকা কেউ নিজে থেকে সিদ্ধান্ত নিয়েছে।</p>
+        <p class="t-en">The history of this country says that real change comes when ordinary people stand up themselves. The language movement. Independence. The fall of autocracy. None of it happened because someone in power decided to act on their own.</p>
+        <p class="t-bn">আমরা দাঁড়াতে চাই। চিৎকার দিয়ে না। তিনদিনের রাগ দিয়ে না। একটা প্রক্রিয়ার মাধ্যমে। আমরা তথ্য সংগ্রহ করি। যাচাই করি। এবং সঠিক কর্তৃপক্ষের কাছে পাঠাই।</p>
+        <p class="t-en">We want to stand up. Not with noise. Not with rage that lasts three days. With a process. We collect information. We verify it. And we get it into the hands of the right authorities.</p>
+        <p class="t-bn"><strong>এটাই আমাদের পরিচয়। এই কারণেই এটা বানিয়েছি।</strong></p>
+        <p class="t-en"><strong>That is who we are. That is why we built this.</strong></p>
+        <p class="who-tagline t-bn">"আমরা দেখছি। আমরা বলব।"<span>We see. We will speak.</span></p>
+        <p class="who-tagline t-en">"আমরা দেখছি। আমরা বলব।"<span>We see. We will speak.</span></p>
+    </div>
+</div>
+</div>
+
+<!-- ======= THE PROBLEM ======= -->
+<div id="problem" class="section">
+<div class="page-wrap">
+    <div class="page-label t-bn">কেন চুপ নই তৈরি হয়েছে</div>
+    <div class="page-label t-en">Why ChupNoi Exists</div>
+    <h2 class="page-title">
+        <span class="t-bn">সমস্যাটা কী।<br><span class="accent">প্রতিদিন।</span></span>
+        <span class="t-en">সমস্যাটা কী।<br><span class="accent">The Problem.</span></span>
+    </h2>
+
+    <p class="section-intro t-bn">বাংলাদেশে প্রতিদিন ১৯ থেকে ২০ টা ধর্ষণের মামলা হয়। <strong>প্রতিদিন।</strong> কিন্তু আপনি মাসে কয়টার কথা জানেন? যেটা ভাইরাল হয়েছে সেটা। বাকিগুলো? থানার ডায়েরিতে। আইনজীবীর ব্যস্ততায়। পরিবারের লজ্জায়। বিচারকের পরবর্তী তারিখে।</p>
+    <p class="section-intro t-en">Every single day, 19 to 20 rape cases are filed somewhere in Bangladesh. <strong>Every. Single. Day.</strong> But how many do you hear about in a month? The one that went viral. What about the rest? They disappear. Into police diaries, lawyers' schedules, families' silences. Into a judge's next date that keeps getting pushed.</p>
+
+    <div class="red-bar">
+        <p class="t-bn">মাগুরায় ২০২৫ সালে একটা ৮ বছরের মেয়েকে ধর্ষণ করে হত্যা করা হয়েছিল। সারা দেশ জেগে উঠেছিল। <em>১৪ কার্যদিবসে মৃত্যুদণ্ড।</em></p>
+        <p class="t-en">In Magura, 2025, an 8-year-old girl was raped and killed. The whole country erupted. <em>Death penalty in 14 working days.</em></p>
+        <p class="t-bn">তনুকে মেরে ফেলা হয়েছিল ২০১৬ সালে। কুমিল্লা ক্যান্টনমেন্টে। ডিএনএ প্রমাণ ছিল তিনজনের বিরুদ্ধে। বাবা বলেছিলেন ২০২৪ সালে, <strong>"আমি আর বিচার চাই না।"</strong> প্রথম গ্রেফতার হলো ২০২৬ সালের এপ্রিলে। দশ বছর পর।</p>
+        <p class="t-en">Tonu was killed in 2016. Inside Cumilla Cantonment. DNA evidence against three men. In 2024, her father said, <strong>"I no longer seek justice."</strong> First arrest came in April 2026. Ten years later.</p>
+        <p class="t-bn">একই অপরাধ। একই দেশ। একটার বিচার হলো ১৪ দিনে। আরেকটার জন্য বাবা আশা ছেড়ে দিলেন। <strong>পার্থক্য একটাই: একটা নিয়ে মানুষ কথা বলেছিল। আরেকটা নিয়ে বলেনি।</strong></p>
+        <p class="t-en">Same crime. Same country. One case got a verdict in 14 days. In the other, a father gave up hope. <strong>The only difference: one case, people talked about. The other, they didn't.</strong></p>
+    </div>
+
+    <div class="problem-grid">
+        <div class="problem-card">
+            <div class="card-number">১৯–২০</div>
+            <h3 class="t-bn">প্রতিদিন ধর্ষণ মামলা</h3>
+            <h3 class="t-en">Rape Cases Per Day</h3>
+            <p class="t-bn">২০২৫ সালে বাংলাদেশে ৭,০৬৮ টা ধর্ষণ মামলা হয়েছে, ২০২৪ থেকে ২৭% বেশি। প্রতিদিন ১৯ থেকে ২০ টা। মাসে মাত্র ১ থেকে ২ টা মূলধারার খবরে আসে। বাকিগুলো সম্পূর্ণ হারিয়ে যায়।</p>
+            <p class="t-en">In 2025, Bangladesh recorded 7,068 rape cases, a 27% increase from 2024. That is 19 to 20 cases every single day. Only 1 to 2 make mainstream news each month. The rest disappear entirely.</p>
+        </div>
+        <div class="problem-card">
+            <div class="card-number">৯৯%</div>
+            <h3 class="t-bn">ভুক্তভোগী অদৃশ্য</h3>
+            <h3 class="t-en">Of Victims Are Invisible</h3>
+            <p class="t-bn">আমরা রামিসাকে চিনি। নুসরাতকে চিনি। কিন্তু রামিসা যে মাসে মারা গেছে, সে মাসে আরো প্রায় ৬০০ ধর্ষণ মামলা হয়েছে। তাদের নাম আমরা একটাও জানি না। এটা স্মৃতির সমস্যা না। এটা সিস্টেমের সমস্যা।</p>
+            <p class="t-en">We know Ramisa. We know Nusrat. But in the same month Ramisa died, approximately 600 other rape cases were filed. We know none of their names. This is not a memory problem. This is a system problem.</p>
+        </div>
+        <div class="problem-card">
+            <div class="card-number">১০</div>
+            <h3 class="t-bn">বছর। শূন্য রায়।</h3>
+            <h3 class="t-en">Years. Zero Verdict.</h3>
+            <p class="t-bn">তনু ২০১৬ সালে কুমিল্লা ক্যান্টনমেন্টে ধর্ষণ ও হত্যার শিকার হয়েছিল। ২০১৭ সালে ৩ জনের বিরুদ্ধে ডিএনএ প্রমাণ মিলেছিল। প্রথম গ্রেফতার ২০২৬ সালের এপ্রিলে। বাবা ২০২৪ সালে বলেছিলেন: "আমি আর বিচার চাই না।"</p>
+            <p class="t-en">Tonu was raped and murdered inside Cumilla Cantonment in 2016. DNA evidence identified 3 perpetrators in 2017. The first arrest came in April 2026. Her father said in 2024: "I no longer seek justice."</p>
+        </div>
+        <div class="problem-card">
+            <div class="card-number">১৪</div>
+            <h3 class="t-bn">দিনে মৃত্যুদণ্ড</h3>
+            <h3 class="t-en">Days to Death Penalty</h3>
+            <p class="t-bn">মাগুরায় ২০২৫ সালে একটা ৮ বছরের মেয়ে ধর্ষণ ও হত্যার শিকার হয়েছিল। মামলাটা জাতীয় হয়েছিল। ১৪ কার্যদিবসে মৃত্যুদণ্ড। তনুর মতো একই অপরাধ। দৃশ্যমানতার কারণে ভিন্ন ফলাফল।</p>
+            <p class="t-en">In Magura, 2025, an 8-year-old girl was raped and murdered. The case went national. Death penalty delivered in 14 working days. Same crime as Tonu. Different outcome because of visibility.</p>
+        </div>
+    </div>
+
+    <div class="contrast-block">
+        <h3 class="t-bn">দৃশ্যমানতার বৈপরীত্য</h3>
+        <h3 class="t-en">The Visibility Paradox</h3>
+        <div class="contrast-row">
+            <div class="contrast-item good">
+                <div class="clabel t-bn">বেশি দৃশ্যমান মামলা</div>
+                <div class="clabel t-en">High Visibility</div>
+                <div class="value t-bn">১৪ দিন</div>
+                <div class="value t-en">14 Days</div>
+                <div class="desc t-bn">মাগুরা ২০২৫। জাতীয় মনোযোগের ১৪ কার্যদিবসের মধ্যে মৃত্যুদণ্ড।</div>
+                <div class="desc t-en">Magura 2025. Death penalty delivered within 14 working days of national attention.</div>
+            </div>
+            <div class="contrast-item bad">
+                <div class="clabel t-bn">কম দৃশ্যমান মামলা</div>
+                <div class="clabel t-en">Low Visibility</div>
+                <div class="value t-bn">১০ বছর</div>
+                <div class="value t-en">10 Years</div>
+                <div class="desc t-bn">তনু ২০১৬। ১০ বছর, ৬ তদন্তকারী, ডিএনএ প্রমাণ, তবুও কোনো রায় নেই।</div>
+                <div class="desc t-en">Tonu 2016. 10 years, 6 investigators, DNA evidence, still no trial verdict.</div>
+            </div>
+        </div>
+        <div class="contrast-row">
+            <div class="contrast-item good">
+                <div class="clabel t-bn">ভাইরাল হওয়া মামলা</div>
+                <div class="clabel t-en">Cases That Trended</div>
+                <div class="value t-bn">দিনের মধ্যে গ্রেফতার</div>
+                <div class="value t-en">Arrests Within Days</div>
+                <div class="desc t-bn">কুমিল্লা ২০২৫। ভাইরাল ভিডিওর ৩ দিন পর পুলিশ নড়েছে। অপরাধের পর না।</div>
+                <div class="desc t-en">Cumilla 2025. Police acted 3 days after viral video. Not after the crime.</div>
+            </div>
+            <div class="contrast-item bad">
+                <div class="clabel t-bn">ভাইরাল না হওয়া মামলা</div>
+                <div class="clabel t-en">Cases That Did Not Trend</div>
+                <div class="value t-bn">বাদীকে মৃত্যুহুমকি</div>
+                <div class="value t-en">Death Threats to Plaintiff</div>
+                <div class="desc t-bn">সিলেট এমসি কলেজ ২০২০। ৫ বছর ধরে মামলা চলছে। ২০২২ সালে বাদী মৃত্যুহুমকি পেয়েছেন।</div>
+                <div class="desc t-en">Sylhet MC College 2020. Case ongoing 5 years. Plaintiff received death threats in 2022.</div>
+            </div>
+        </div>
+        <p style="color:#444;font-size:13px;margin-top:14px;" class="t-bn">সিস্টেম সাড়া দেয় হ্যাশট্যাগে, অপরাধের গুরুত্বে না। চুপ নই এটা বদলাতে এসেছে।</p>
+        <p style="color:#444;font-size:13px;margin-top:14px;" class="t-en">The system responds to hashtags, not crime severity. ChupNoi exists to change this.</p>
+    </div>
+
+    <div class="problem-appeal">
+        <p class="t-bn">আমরা গণপিটুনি চাই না। <strong>আমরা চাই যা হয়েছে তা রেকর্ডে থাকুক।</strong> সঠিক মানুষের কাছে পৌঁছাক। ফাইলে চাপা না পড়ুক।</p>
+        <p class="t-en">We do not want mob justice. <strong>We want what happened to be on record.</strong> To reach the right hands. To not get buried in a file somewhere.</p>
+        <p class="t-bn">আপনি যদি কোনো মামলার কথা জানেন, কেউ কষ্ট পেয়েছে যার গল্প কেউ শোনেনি, <strong>আমরা শুনতে চাই।</strong> নাম লাগবে না। কাগজ লাগবে না। শুধু যা জানেন লিখুন। আমরা যাচাই করব। সঠিক কর্তৃপক্ষের কাছে পাঠাব।</p>
+        <p class="t-en">If you know about a case, someone who was hurt and whose story was never heard, <strong>we want to hear it.</strong> You do not need to give your name. You do not need documents. Just write down what you know. We will verify it. We will send it forward.</p>
+        <p class="t-bn">এটাই জবাবদিহিতা। <strong>আপনিই সেই সুতো।</strong></p>
+        <p class="t-en">That is accountability. <strong>আপনিই সেই সুতো। You are that thread.</strong></p>
+        <p class="closing t-bn">"চুপ নই। থামব না।"</p>
+        <p class="closing t-en">"চুপ নই। Not silent. Not anymore."</p>
+    </div>
+</div>
+</div>
+
+<!-- ======= CHARTER ======= -->
+<div id="charter" class="section">
+<div class="page-wrap">
+    <div class="page-label t-bn">আমাদের সনদ</div>
+    <div class="page-label t-en">Our Charter</div>
+    <h2 class="page-title">
+        <span class="t-bn">আমাদের সনদ।<br><span class="accent">আমরা যা চাই।</span></span>
+        <span class="t-en">আমাদের সনদ।<br><span class="accent">What We Stand For.</span></span>
+    </h2>
+
+    <p class="section-intro t-bn">এটা কোনো রাজনৈতিক দলিল না। এটা একটা প্রতিশ্রুতি। আমাদের নিজেদের কাছে, আপনাদের কাছে, এবং সেই প্রতিটা শিশুর কাছে যারা এখনো বিচারের অপেক্ষায়। পরিবর্তন দুইটা জায়গা থেকে আসতে হবে। <strong>উপর থেকে, ক্ষমতায় থাকাদের কাছ থেকে। এবং ভেতর থেকে, আমাদের প্রত্যেকের কাছ থেকে।</strong></p>
+    <p class="section-intro t-en">This is not a political document. It is a promise. To ourselves, to you, and to every child still waiting for justice. Change has to come from two places at once. <strong>From the top, from those in power. And from within, from each one of us.</strong></p>
+
+    <!-- PART 1 -->
+    <div class="charter-part-label t-bn">প্রথম অংশ</div>
+    <div class="charter-part-label t-en">Part One</div>
+    <h3 class="charter-part-title t-bn">সরকারের কাছে আমাদের দাবি</h3>
+    <h3 class="charter-part-title t-en">What We Want From the Government</h3>
+    <p class="charter-part-sub t-bn">আমরা সরকারের বিরুদ্ধে না। আমরা চাই সরকার তার কাজ করুক। নিচের প্রতিটা দাবি এই দেশের আইন, সমাজ ও সন্তানদের জন্য।</p>
+    <p class="charter-part-sub t-en">We are not against the government. We want the government to do its job. Every demand below is for this country, its laws, its society, and its children.</p>
+
+    <div class="demand-list">
+        <div class="demand-item">
+            <div class="demand-num"><span>০১</span></div>
+            <div class="demand-content">
+                <h4 class="t-bn">বাধ্যতামূলক রিপোর্টিং আইন</h4>
+                <h4 class="t-en">Mandatory Reporting Law</h4>
+                <p class="t-bn">প্রতিটা ডাক্তার, শিক্ষক, এনজিও কর্মী, ইমাম, পুরোহিত, যে কেউ জানেন বা সন্দেহ করেন কোনো শিশু বিপদে আছে, তাকে আইনত বাধ্য করতে হবে স্থানীয় কর্তৃপক্ষকে জানাতে। জানা সত্ত্বেও চুপ থাকা যদি অপরাধ হয়, অনেক কিছু বদলে যাবে। কারণ এখন অনেকে জানেন, কিন্তু বলেন না।</p>
+                <p class="t-en">Every doctor, teacher, NGO worker, imam, priest, anyone who knows or suspects a child is in danger must be legally required to report it to local authorities. Staying silent when you know should be a punishable offence. Because right now, too many people know. And too many people say nothing.</p>
+            </div>
+        </div>
+        <div class="demand-item">
+            <div class="demand-num"><span>০২</span></div>
+            <div class="demand-content">
+                <h4 class="t-bn">জাতীয় যৌন অপরাধী নিবন্ধন</h4>
+                <h4 class="t-en">A National Sex Offender Registry</h4>
+                <p class="t-bn">যে ব্যক্তি একবার এই অপরাধে দোষী সাব্যস্ত হয়েছে, তার নাম, ছবি এবং তথ্য একটা জাতীয় ডেটাবেজে থাকবে। স্কুল, মাদ্রাসা, কিন্ডারগার্টেন সহ শিশু-সংক্রান্ত যেকোনো প্রতিষ্ঠান নিয়োগের আগে এই তালিকা দেখতে পারবে। একজন অপরাধী যেন বারবার নতুন জায়গায় গিয়ে নতুন শিকার খুঁজতে না পারে।</p>
+                <p class="t-en">Anyone convicted of these crimes should have their name, photo, and details on a national database. Schools, madrasas, kindergartens, any institution working with children should be able to check this list before hiring. A convicted offender should not be able to walk into a new neighbourhood and find new victims.</p>
+            </div>
+        </div>
+        <div class="demand-item">
+            <div class="demand-num"><span>০৩</span></div>
+            <div class="demand-content">
+                <h4 class="t-bn">প্রতিটা থানায় শিশু সুরক্ষা ইউনিট</h4>
+                <h4 class="t-en">A Dedicated Child Protection Unit in Every Police Station</h4>
+                <p class="t-bn">একটা মেয়ে থানায় গেলে তাকে একজন পুরুষ অফিসারের সামনে সব বলতে হবে না। প্রতিটা থানায় প্রশিক্ষিত নারী অফিসার থাকবে, একটা শিশু-বান্ধব রিপোর্টিং কক্ষ থাকবে, এবং একজন শিশু মনোবিজ্ঞানী অন-কলে থাকবে। ট্রমায় থাকা কারো কাছ থেকে বিবৃতি নেওয়া একটা দক্ষতার কাজ। আমরা এখন শুধু সেই কক্ষটা চাইছি।</p>
+                <p class="t-en">A girl who walks into a police station should not have to tell her story to a male officer in a room full of strangers. Every station needs trained female officers, a child-friendly reporting room, and a child psychologist available on call. Taking a statement from someone in trauma is a skill. Right now we are not even asking for the skill. We are asking for the room.</p>
+            </div>
+        </div>
+        <div class="demand-item">
+            <div class="demand-num"><span>০৪</span></div>
+            <div class="demand-content">
+                <h4 class="t-bn">ফাস্ট-ট্র্যাক আদালত, ১৮০ দিনের মধ্যে রায়</h4>
+                <h4 class="t-en">Fast-Track Courts, Verdict Within 180 Days</h4>
+                <p class="t-bn">ঘটনার তারিখ থেকে ১৮০ দিনের মধ্যে শিশু নির্যাতন ও ধর্ষণ মামলার রায় হতে হবে। তনুর বাবা ১০ বছর অপেক্ষা করেছেন। এটা আর হওয়া উচিত না। বিচারে দেরি মানে বিচার না পাওয়া। আর বিচার না পাওয়া মানে পরবর্তী অপরাধীকে সাহস দেওয়া।</p>
+                <p class="t-en">From the date of the incident, every child abuse and rape case must be resolved within 180 days. Tonu's father waited 10 years. That cannot keep happening. Justice delayed is not justice. And justice denied tells the next perpetrator that he has time on his side.</p>
+            </div>
+        </div>
+        <div class="demand-item">
+            <div class="demand-num"><span>০৫</span></div>
+            <div class="demand-content">
+                <h4 class="t-bn">সবার জন্য সরকারি মানসিক স্বাস্থ্যসেবা</h4>
+                <h4 class="t-en">Public Mental Health Infrastructure for Every Child</h4>
+                <p class="t-bn">একটা শিশু যে নির্যাতনের শিকার হয়েছে, তার শুধু বিচার দরকার না। তার সুস্থ হওয়া দরকার। দেশের প্রতিটা উপজেলায় শিশুদের জন্য বিনামূল্যে মানসিক স্বাস্থ্যসেবা নিশ্চিত করতে হবে। কারণ ক্ষত শুধু শরীরে থাকে না।</p>
+                <p class="t-en">A child who has been abused does not just need a verdict. They need to heal. Free mental health services for children must be available in every upazila across the country. Because the wound does not only live in the body.</p>
+            </div>
+        </div>
+        <div class="demand-item">
+            <div class="demand-num"><span>০৬</span></div>
+            <div class="demand-content">
+                <h4 class="t-bn">অনলাইন শিশু শোষণ প্রতিরোধে বিশেষ টাস্কফোর্স</h4>
+                <h4 class="t-en">An Online Child Exploitation Task Force</h4>
+                <p class="t-bn">অপরাধ এখন রাস্তায় সীমাবদ্ধ নেই। সে ঢুকে গেছে ফোনে, গেমিং অ্যাপে, মেসেঞ্জারে। একটা বিশেষ টাস্কফোর্স দরকার যারা অনলাইন শিকারি খুঁজে বের করবে, প্রমাণ সংগ্রহ করবে এবং আক্রমণ হওয়ার আগেই ব্যবস্থা নেবে। অভিযোগের অপেক্ষা করা অনেক দেরি হয়ে যায়।</p>
+                <p class="t-en">The crime has moved. It is now inside the phone, the gaming app, the messenger. A dedicated task force must hunt online predators, gather evidence, and take action before the abuse happens. Waiting for a complaint is too late. Preemptive action is the only answer.</p>
+            </div>
+        </div>
+    </div>
+
+    <hr class="charter-divider">
+
+    <!-- PART 2 -->
+    <div class="charter-part-label t-bn">দ্বিতীয় অংশ</div>
+    <div class="charter-part-label t-en">Part Two</div>
+    <h3 class="charter-part-title t-bn">মানুষের কাছে আমাদের আবেদন</h3>
+    <h3 class="charter-part-title t-en">What We Ask of Each Other</h3>
+    <p class="charter-part-sub t-bn">সরকার একা পারবে না। আমরাও জানি। কিন্তু আমরাও যদি বসে থাকি, কিছুই হবে না। এই অংশটা আইনের কথা না। এটা আমাদের নিজেদের কথা।</p>
+    <p class="charter-part-sub t-en">The government cannot do this alone. We know that. But if we sit back and wait, nothing changes either. This part is not about law. It is about us.</p>
+
+    <div class="demand-list">
+        <div class="demand-item">
+            <div class="demand-num"><span>ক</span></div>
+            <div class="demand-content">
+                <h4 class="t-bn">শরীরের নিরাপত্তার কথা ঘরে বলুন</h4>
+                <h4 class="t-en">Talk About Body Safety at Home</h4>
+                <p class="t-bn">আপনার ছেলে বা মেয়েকে বলুন, কেউ তার শরীরে অনুমতি ছাড়া হাত দিতে পারবে না। কেউ না। আত্মীয় হলেও না, শিক্ষক হলেও না। এই কথাটা বলতে লজ্জা নেই। না বললেই বিপদ। একটা সচেতন সন্তান অনেক বেশি নিরাপদ।</p>
+                <p class="t-en">Tell your son or daughter that no one is allowed to touch their body without permission. No one. Not a relative, not a teacher, not a family friend. This conversation is not shameful. Not having it is what puts children in danger. A child who knows their rights is a child who is harder to harm.</p>
+            </div>
+        </div>
+        <div class="demand-item">
+            <div class="demand-num"><span>খ</span></div>
+            <div class="demand-content">
+                <h4 class="t-bn">সতর্ক থাকুন, চুপ থাকবেন না</h4>
+                <h4 class="t-en">Stay Vigilant. Do Not Stay Quiet.</h4>
+                <p class="t-bn">পশু নির্যাতন, বুলিং, দুর্বলদের হেয় করা এগুলো ছোট মনে হলেও সতর্কতার লক্ষণ। আশেপাশে কাউকে এরকম আচরণ করতে দেখলে রিপোর্ট করুন। নজর রাখা দায়িত্ব, নাক গলানো না।</p>
+                <p class="t-en">Animal cruelty, bullying, targeting those who are weaker. These are not small things. They are warning signs. If you see this behaviour in someone around you, report it. Watching out for others is not interfering. It is responsibility.</p>
+            </div>
+        </div>
+        <div class="demand-item">
+            <div class="demand-num"><span>গ</span></div>
+            <div class="demand-content">
+                <h4 class="t-bn">বেঁচে যাওয়া মানুষকে বিচার করবেন না</h4>
+                <h4 class="t-en">Do Not Judge the Survivor</h4>
+                <p class="t-bn">একটা মেয়ে কী পরেছিল, কোথায় গিয়েছিল, কখন ঘরে ফিরেছিল, এগুলো কোনো প্রশ্নের বিষয় না। অপরাধটা তার ছিল না। কেউ সাহস করে বললে, প্রথমে বিশ্বাস করুন। বিশ্বাস না পেলে তারা আর বলবে না। আর না বললে অপরাধী আবার সুযোগ পাবে।</p>
+                <p class="t-en">What she was wearing, where she was going, what time she came home. None of this is relevant. The crime was not hers. When someone finds the courage to speak, the first thing they need is to be believed. If they are met with doubt and shame, they will never speak again. And silence is exactly what the perpetrator is counting on.</p>
+            </div>
+        </div>
+        <div class="demand-item">
+            <div class="demand-num"><span>ঘ</span></div>
+            <div class="demand-content">
+                <h4 class="t-bn">তিনদিনের আবেগ নয়, দীর্ঘমেয়াদী সচেতনতা</h4>
+                <h4 class="t-en">Sustained Action, Not Three Days of Outrage</h4>
+                <p class="t-bn">একটা ঘটনা ভাইরাল হলে সবাই জেগে ওঠে। তিনদিন পর সবাই ভুলে যায়। এই চক্র ভাঙতে হবে। স্কুলে, মসজিদে, মন্দিরে, চায়ের দোকানে, ঘরে, বছরের পর বছর এই কথা বলতে হবে। একটা মোমবাতি মিছিল কিছু করে না। কিন্তু একটা সচেতন সমাজ অনেক কিছু করতে পারে।</p>
+                <p class="t-en">A case goes viral. Everyone is furious. Three days later, everyone forgets. This cycle is what perpetrators rely on. We have to break it. In schools, mosques, temples, in tea stalls and living rooms, this conversation has to keep happening. A candlelight march does very little. A community that stays awake does a great deal.</p>
+            </div>
+        </div>
+        <div class="demand-item">
+            <div class="demand-num"><span>ঙ</span></div>
+            <div class="demand-content">
+                <h4 class="t-bn">নেতাদের জবাবদিহি করুন</h4>
+                <h4 class="t-en">Hold Your Leaders Accountable</h4>
+                <p class="t-bn">আপনার সন্তানের শিক্ষক, মসজিদের ইমাম, মন্দিরের পুরোহিত, পাড়ার কাউন্সিলর, এরা সবাই দায়িত্বশীল মানুষ। তারা যদি কোনো অপরাধকে আড়াল করে, তাহলে সরাসরি জিজ্ঞেস করুন। কারণ আপনার নীরবতা তাদের সাহস দেয়।</p>
+                <p class="t-en">Your child's teacher, the imam of your mosque, the priest of your temple, the councillor of your ward. These are people in positions of trust. If they cover for an abuser, ask them why. Directly. Your silence gives them cover. Your voice takes it away.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="charter-vision">
+        <p class="t-bn">এমন একটা দেশ যেখানে একটা মেয়ে রাতে একা রাস্তায় হাঁটতে পারে। যেখানে একটা বাচ্চা তার বিশ্বস্ত মানুষের কাছে নিরাপদ। যেখানে বিচার ১০ বছর ধরে অপেক্ষায় থাকে না। যেখানে অপরাধী জানে, কোথাও না কোথাও, কেউ না কেউ, দেখছে।</p>
+        <p class="t-en">A country where a girl can walk alone at night. Where a child is safe with the adults they trust. Where justice does not take a decade. Where a perpetrator knows that somewhere, somehow, someone is watching.</p>
+        <p class="t-bn"><strong>এটা স্বপ্ন না। এটা আমাদের দাবি।</strong></p>
+        <p class="t-en"><strong>This is not a dream. This is our demand.</strong></p>
+        <p class="closing t-bn">"চুপ নই। থামব না।"</p>
+        <p class="closing t-en">"চুপ নই। Not silent."</p>
+    </div>
+</div>
+</div>
+
+<!-- ======= PLEDGE ======= -->
+<div id="pledge" class="section">
+<div class="page-wrap">
+    <div class="page-label t-bn">পেশাদার সহায়তা নেটওয়ার্ক</div>
+    <div class="page-label t-en">Professional Support Network</div>
+    <h2 class="page-title">
+        <span class="t-bn">আপনার সহযোগিতা দিন।<br><span class="accent">পাশে দাঁড়ান।</span></span>
+        <span class="t-en">Pledge Your Support.<br><span class="accent">Stand With Survivors.</span></span>
+    </h2>
+
+    <div class="pledge-tabs">
+        <button class="pledge-tab active" onclick="showPledge('ngo',event)">
+            <span class="t-bn">এনজিও ও সংস্থা</span><span class="t-en">NGOs & Organizations</span>
+        </button>
+        <button class="pledge-tab" onclick="showPledge('lawyer',event)">
+            <span class="t-bn">আইনজীবী</span><span class="t-en">Lawyers</span>
+        </button>
+        <button class="pledge-tab" onclick="showPledge('doctor',event)">
+            <span class="t-bn">ডাক্তার ও মনোবিজ্ঞানী</span><span class="t-en">Doctors & Psychologists</span>
+        </button>
+    </div>
+
+    <div id="ngo-form" class="pledge-form-container active">
+        <div class="pledge-intro">
+            <span class="t-bn"><strong>এনজিও ও সংস্থাগুলোর জন্য</strong> যারা শিশু সুরক্ষা, নারী অধিকার ও জবাবদিহিতায় প্রতিশ্রুতিবদ্ধ। আপনার সংস্থা যাচাইকৃত সমর্থক হিসেবে প্রকাশ্যে তালিকাভুক্ত হবে।</span>
+            <span class="t-en"><strong>For NGOs and organizations</strong> committed to child safety, women's rights, and accountability in Bangladesh. Your organization will be listed publicly as a verified supporter and resource.</span>
+        </div>
+        <div class="form-grid">
+            <div class="form-field">
+                <label><span class="t-bn">সংস্থার নাম</span><span class="t-en">Organization Name</span></label>
+                <input type="text" placeholder="Full official name">
+            </div>
+            <div class="form-field">
+                <label><span class="t-bn">নিবন্ধন নম্বর</span><span class="t-en">Registration Number</span></label>
+                <input type="text" placeholder="NGO Affairs Bureau / Joint Stock">
+            </div>
+            <div class="form-field">
+                <label><span class="t-bn">যোগাযোগের ব্যক্তি</span><span class="t-en">Contact Person</span></label>
+                <input type="text" placeholder="Full name">
+            </div>
+            <div class="form-field">
+                <label><span class="t-bn">পদবি</span><span class="t-en">Designation</span></label>
+                <input type="text" placeholder="Executive Director, etc.">
+            </div>
+            <div class="form-field">
+                <label><span class="t-bn">ইমেইল</span><span class="t-en">Email Address</span></label>
+                <input type="email" placeholder="official@organization.org">
+            </div>
+            <div class="form-field">
+                <label><span class="t-bn">ফোন নম্বর</span><span class="t-en">Phone Number</span></label>
+                <input type="tel" placeholder="+880">
+            </div>
+            <div class="form-field">
+                <label><span class="t-bn">কার্যক্ষেত্র জেলা</span><span class="t-en">District of Operation</span></label>
+                <input type="text" placeholder="Dhaka, Chittagong, etc.">
+            </div>
+            <div class="form-field">
+                <label><span class="t-bn">মনোযোগের ক্ষেত্র</span><span class="t-en">Focus Area</span></label>
+                <select>
+                    <option>Child Protection / শিশু সুরক্ষা</option>
+                    <option>Women's Rights / নারী অধিকার</option>
+                    <option>Legal Aid / আইনি সহায়তা</option>
+                    <option>Mental Health / মানসিক স্বাস্থ্য</option>
+                    <option>Human Rights / মানবাধিকার</option>
+                    <option>Other / অন্যান্য</option>
+                </select>
+            </div>
+            <div class="form-field form-full">
+                <label><span class="t-bn">চুপ নইকে কীভাবে সহযোগিতা করবেন?</span><span class="t-en">How will your organization support ChupNoi?</span></label>
+                <textarea rows="4" placeholder="Case verification, legal support, survivor services, advocacy..."></textarea>
+            </div>
+        </div>
+        <button class="pledge-submit">
+            <span class="t-bn">সহযোগিতার প্রতিশ্রুতি দিন</span><span class="t-en">Submit Pledge</span>
+        </button>
+    </div>
+
+    <div id="lawyer-form" class="pledge-form-container">
+        <div class="pledge-intro">
+            <span class="t-bn"><strong>আইনজীবীদের জন্য</strong> যারা বিনামূল্যে বা ভর্তুকিমূলক আইনি সহায়তা দিতে ইচ্ছুক। আপনি আমাদের নেটওয়ার্কে যাচাইকৃত আইনি সহায়তাকারী হিসেবে তালিকাভুক্ত হবেন।</span>
+            <span class="t-en"><strong>For lawyers</strong> willing to provide pro bono or subsidized legal support to survivors and their families. You will be listed as a verified legal resource in our network.</span>
+        </div>
+        <div class="form-grid">
+            <div class="form-field">
+                <label><span class="t-bn">পুরো নাম</span><span class="t-en">Full Name</span></label>
+                <input type="text" placeholder="As per Bar Council ID">
+            </div>
+            <div class="form-field">
+                <label><span class="t-bn">বাংলাদেশ বার কাউন্সিল আইডি</span><span class="t-en">Bangladesh Bar Council ID</span></label>
+                <input type="text" placeholder="BBC Registration Number">
+            </div>
+            <div class="form-field">
+                <label><span class="t-bn">অনুশীলনের আদালত</span><span class="t-en">Court of Practice</span></label>
+                <select><option>Supreme Court</option><option>High Court Division</option><option>District Court</option><option>Sessions Court</option><option>Other</option></select>
+            </div>
+            <div class="form-field">
+                <label><span class="t-bn">বিশেষজ্ঞতা</span><span class="t-en">Specialization</span></label>
+                <select><option>Criminal Law</option><option>Family Law</option><option>Child Rights</option><option>Human Rights</option><option>Women's Rights</option><option>General Practice</option></select>
+            </div>
+            <div class="form-field">
+                <label><span class="t-bn">ইমেইল</span><span class="t-en">Email Address</span></label>
+                <input type="email" placeholder="your@email.com">
+            </div>
+            <div class="form-field">
+                <label><span class="t-bn">ফোন নম্বর</span><span class="t-en">Phone Number</span></label>
+                <input type="tel" placeholder="+880">
+            </div>
+            <div class="form-field">
+                <label><span class="t-bn">জেলা</span><span class="t-en">District</span></label>
+                <input type="text" placeholder="Where you practice">
+            </div>
+            <div class="form-field">
+                <label><span class="t-bn">সহায়তার ধরন</span><span class="t-en">Support Type</span></label>
+                <select><option>Pro Bono (free)</option><option>Subsidized fees</option><option>Consultation only</option><option>Case referral</option></select>
+            </div>
+        </div>
+        <button class="pledge-submit">
+            <span class="t-bn">সহযোগিতার প্রতিশ্রুতি দিন</span><span class="t-en">Submit Pledge</span>
+        </button>
+    </div>
+
+    <div id="doctor-form" class="pledge-form-container">
+        <div class="pledge-intro">
+            <span class="t-bn"><strong>ডাক্তার ও মনোবিজ্ঞানীদের জন্য</strong> যারা ভুক্তভোগীদের চিকিৎসা ও মানসিক সহায়তা দিতে ইচ্ছুক। ফরেনসিক বিশেষজ্ঞ, মনোরোগ বিশেষজ্ঞ সহ সবাইকে স্বাগত।</span>
+            <span class="t-en"><strong>For doctors and psychologists</strong> willing to provide medical and mental health support to survivors. Forensic doctors, psychiatrists, psychologists, and general practitioners are all welcome.</span>
+        </div>
+        <div class="form-grid">
+            <div class="form-field">
+                <label><span class="t-bn">পুরো নাম</span><span class="t-en">Full Name</span></label>
+                <input type="text" placeholder="As per BMDC registration">
+            </div>
+            <div class="form-field">
+                <label><span class="t-bn">বিএমডিসি নিবন্ধন নম্বর</span><span class="t-en">BMDC Registration Number</span></label>
+                <input type="text" placeholder="Bangladesh Medical & Dental Council ID">
+            </div>
+            <div class="form-field">
+                <label><span class="t-bn">বিশেষজ্ঞতা</span><span class="t-en">Specialization</span></label>
+                <select><option>Psychiatry</option><option>Clinical Psychology</option><option>Forensic Medicine</option><option>Gynaecology</option><option>Paediatrics</option><option>General Medicine</option><option>Other</option></select>
+            </div>
+            <div class="form-field">
+                <label><span class="t-bn">প্রতিষ্ঠান / হাসপাতাল</span><span class="t-en">Institution / Hospital</span></label>
+                <input type="text" placeholder="Where you practice">
+            </div>
+            <div class="form-field">
+                <label><span class="t-bn">ইমেইল</span><span class="t-en">Email Address</span></label>
+                <input type="email" placeholder="your@email.com">
+            </div>
+            <div class="form-field">
+                <label><span class="t-bn">ফোন নম্বর</span><span class="t-en">Phone Number</span></label>
+                <input type="tel" placeholder="+880">
+            </div>
+            <div class="form-field">
+                <label><span class="t-bn">জেলা</span><span class="t-en">District</span></label>
+                <input type="text" placeholder="Where you practice">
+            </div>
+            <div class="form-field">
+                <label><span class="t-bn">সহায়তার ধরন</span><span class="t-en">Support Type</span></label>
+                <select><option>Free consultation</option><option>Subsidized treatment</option><option>Forensic examination</option><option>Mental health support</option><option>Expert witness in court</option></select>
+            </div>
+        </div>
+        <button class="pledge-submit">
+            <span class="t-bn">সহযোগিতার প্রতিশ্রুতি দিন</span><span class="t-en">Submit Pledge</span>
+        </button>
+    </div>
+
+    <div class="pledged-list">
+        <h3 class="t-bn">যাচাইকৃত সমর্থক</h3>
+        <h3 class="t-en">Verified Supporters</h3>
+        <div class="pledged-grid">
+            <div class="pledged-card">
+                <div class="name t-bn">আপনার সংস্থা এখানে</div>
+                <div class="name t-en">Your organization here</div>
+                <div class="role t-bn">এনজিও · শিশু সুরক্ষা</div>
+                <div class="role t-en">NGO · Child Protection</div>
+                <div class="org">Dhaka</div>
+            </div>
+            <div class="pledged-card">
+                <div class="name t-bn">আপনার নাম এখানে</div>
+                <div class="name t-en">Your name here</div>
+                <div class="role t-bn">আইনজীবী · ফৌজদারি আইন</div>
+                <div class="role t-en">Lawyer · Criminal Law</div>
+                <div class="org">Supreme Court</div>
+            </div>
+            <div class="pledged-card">
+                <div class="name t-bn">আপনার নাম এখানে</div>
+                <div class="name t-en">Your name here</div>
+                <div class="role t-bn">মনোবিজ্ঞানী · ক্লিনিকাল</div>
+                <div class="role t-en">Psychologist · Clinical</div>
+                <div class="org">Chittagong</div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- ======= REPORT ======= -->
+<div id="report" class="section">
+<div class="page-wrap">
+    <div class="page-label t-bn">রিপোর্ট ও জবাবদিহিতা</div>
+    <div class="page-label t-en">Report & Accountability</div>
+    <h2 class="page-title">
+        <span class="t-bn">প্রতিটা মামলা দেখা পাওয়ার<br><span class="accent">যোগ্য।</span></span>
+        <span class="t-en">Every Case Deserves<br><span class="accent">To Be Seen.</span></span>
+    </h2>
+
+    <div class="tier-grid">
+        <div class="tier-card">
+            <div class="tier-indicator tier-green"></div>
+            <h3 class="t-bn">সবুজ স্তর</h3>
+            <h3 class="t-en">Green Tier</h3>
+            <p class="t-bn">আদালত-যাচাইকৃত দণ্ডাদেশ। সরকারি নথি আছে। ২টির বেশি বিশ্বস্ত সংবাদ উৎস। সরাসরি পাবলিক ডেটাবেজে প্রকাশ।</p>
+            <p class="t-en">Court-verified conviction. Official documents available. 2+ credible news sources. Published immediately to public database.</p>
+        </div>
+        <div class="tier-card">
+            <div class="tier-indicator tier-yellow"></div>
+            <h3 class="t-bn">হলুদ স্তর</h3>
+            <h3 class="t-en">Yellow Tier</h3>
+            <p class="t-bn">একাধিক বিশ্বস্ত উৎস। পুলিশ এফআইআর নিশ্চিত। রায় নেই কিন্তু শক্তিশালী প্রমাণ আছে। "অভিযোগ, যাচাইকরণ চলছে" লেবেলসহ প্রকাশ।</p>
+            <p class="t-en">Multiple credible sources. Police FIR confirmed. No verdict yet but strong evidence. Published with "Alleged, pending verification" label.</p>
+        </div>
+        <div class="tier-card">
+            <div class="tier-indicator tier-red"></div>
+            <h3 class="t-bn">লাল স্তর</h3>
+            <h3 class="t-en">Red Tier</h3>
+            <p class="t-bn">একটি উৎস বা যাচাইহীন অভিযোগ। এনজিও পার্টনার পর্যালোচনার জন্য রাখা হবে। যাচাই না হওয়া পর্যন্ত প্রকাশিত হবে না। আপনার সাথে যোগাযোগ করা হতে পারে।</p>
+            <p class="t-en">Single source or unverified allegations. Held for NGO partner review. Not published until verified. You may be contacted for more information.</p>
+        </div>
+    </div>
+
+    <div class="report-cta-block">
+        <h3 class="t-bn">একটি রিপোর্ট জমা দিন</h3>
+        <h3 class="t-en">Submit a Report</h3>
+        <p class="t-bn">সমস্ত জমা আমাদের এনজিও পার্টনারদের দ্বারা ৫ থেকে ৭ দিনের মধ্যে পর্যালোচনা করা হয়। নাম দিতে হবে না। কাগজ লাগবে না। শুধু যা জানেন বলুন।</p>
+        <p class="t-en">All submissions are reviewed by our NGO partners within 5 to 7 days. You do not need to give your name. You do not need documents. Just tell us what you know.</p>
+        <a href="https://mahmud-khairul.github.io/report-abuse-bd/" target="_blank" class="btn-primary">
+            <span class="t-bn">রিপোর্ট ফর্মে যান</span><span class="t-en">Go to Report Form</span>
+        </a>
+    </div>
+
+    <div class="process-steps">
+        <div class="step">
+            <div class="step-number">০১</div>
+            <h4 class="t-bn">আপনি জমা দিন</h4>
+            <h4 class="t-en">You Submit</h4>
+            <p class="t-bn">চাইলে পরিচয় গোপন রেখে। যা জানেন তাই লিখুন।</p>
+            <p class="t-en">Anonymously if you want. Fill the form with what you know.</p>
+        </div>
+        <div class="step">
+            <div class="step-number">০২</div>
+            <h4 class="t-bn">আমরা শ্রেণিবদ্ধ করি</h4>
+            <h4 class="t-en">We Classify</h4>
+            <p class="t-bn">মামলা সবুজ, হলুদ বা লাল স্তরে শ্রেণিবদ্ধ করা হয়।</p>
+            <p class="t-en">Case is classified Green, Yellow, or Red based on available evidence.</p>
+        </div>
+        <div class="step">
+            <div class="step-number">০৩</div>
+            <h4 class="t-bn">এনজিও যাচাই করে</h4>
+            <h4 class="t-en">NGO Verifies</h4>
+            <p class="t-bn">আমাদের পার্টনার এনজিওরা ৫ থেকে ৭ দিনের মধ্যে যাচাই করে।</p>
+            <p class="t-en">Our partner NGOs verify the submission within 5 to 7 days.</p>
+        </div>
+        <div class="step">
+            <div class="step-number">০৪</div>
+            <h4 class="t-bn">কর্তৃপক্ষের কাছে পাঠানো</h4>
+            <h4 class="t-en">Sent Forward</h4>
+            <p class="t-bn">যাচাইকৃত মামলা পাবলিক ডেটাবেজ ও সরাসরি আইন প্রয়োগকারী কর্তৃপক্ষের কাছে যায়।</p>
+            <p class="t-en">Verified cases go to the public database and directly to law enforcement authorities.</p>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+    <div class="logo">চুপ <span>নই</span> | ChupNoi.org</div>
+    <p>আমরা দেখছি। আমরা বলব।<br>We see. We will speak.</p>
+    <p style="font-size:11px;color:#333;">
+        <span class="t-bn">শিশু সুরক্ষার জন্য। জবাবদিহিতার জন্য।</span>
+        <span class="t-en">For child protection. For accountability.</span>
+        <br>Bangladesh, 2026.
+    </p>
+</footer>
+
+<script>
+    const tabMap = { home:0, whoarewe:1, problem:2, charter:3, pledge:4, report:5 };
+
+    function showSection(id) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        const el = document.getElementById(id);
+        if (el) el.classList.add('active');
+        const tabs = document.querySelectorAll('.nav-tab');
+        if (tabs[tabMap[id]] !== undefined) tabs[tabMap[id]].classList.add('active');
+        window.scrollTo(0, 0);
+    }
+
+    function showPledge(type, e) {
+        document.querySelectorAll('.pledge-form-container').forEach(f => f.classList.remove('active'));
+        document.querySelectorAll('.pledge-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById(type + '-form').classList.add('active');
+        if (e && e.target) e.target.classList.add('active');
+    }
+
+    function setLang(lang) {
+        document.body.className = 'lang-' + lang;
+        document.getElementById('btn-bn').classList.toggle('active', lang === 'bn');
+        document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+        document.documentElement.lang = lang;
+        localStorage.setItem('chupnoi-lang', lang);
+    }
+
+    // Restore saved preference
+    const saved = localStorage.getItem('chupnoi-lang');
+    if (saved) setLang(saved);
+
+    document.querySelectorAll('.pledge-submit').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const isBn = document.body.classList.contains('lang-bn');
+            this.innerHTML = isBn
+                ? '<span class="t-bn">প্রতিশ্রুতি জমা হয়েছে। ধন্যবাদ।</span>'
+                : '<span class="t-en">Pledge Submitted. Thank you.</span>';
+            this.style.background = '#27ae60';
+            this.disabled = true;
+        });
+    });
+</script>
+</body>
+</html>
